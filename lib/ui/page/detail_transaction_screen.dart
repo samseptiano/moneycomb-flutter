@@ -1,29 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:money_comb/bloc/bloc/expense/expense_bloc.dart';
 import 'package:money_comb/bloc/bloc/income/income_bloc.dart';
-import 'package:money_comb/constants/constants.dart';
-import 'package:money_comb/constants/expenseCategory.dart';
-import 'package:money_comb/models/expense.dart';
-import 'package:money_comb/models/income.dart';
-import 'package:money_comb/ui/page/add_or_update_page.dart';
+import 'package:money_comb/ui/page/add_or_update_screen.dart';
 import 'package:money_comb/ui/widgets/detail_content.dart';
-import 'package:money_comb/util/stringUtil.dart';
-import '../widgets/custom_text.dart';
 
-class DetailsPage extends StatefulWidget {
+class DetailTransactionScreen extends StatefulWidget {
   final bool isExpense;
 
-  const DetailsPage({Key? key, required this.isExpense}) : super(key: key);
+  const DetailTransactionScreen({Key? key, required this.isExpense}) : super(key: key);
 
   @override
-  State<DetailsPage> createState() => _DetailsPageState();
+  State<DetailTransactionScreen> createState() => _DetailTransactionScreenState();
 }
 
-class _DetailsPageState extends State<DetailsPage> {
-  final TextEditingController _newTitle = TextEditingController();
-  final TextEditingController _newDescription = TextEditingController();
+class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
   bool toggleSwitch = false;
 
   @override
@@ -60,7 +51,7 @@ class _DetailsPageState extends State<DetailsPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => AddOrUpdatePage(
+                            builder: (_) => AddOrUpdateScreen(
                                 isUpdate: true, item: state.expense),
                           ),
                         );
@@ -80,7 +71,7 @@ class _DetailsPageState extends State<DetailsPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => AddOrUpdatePage(
+                            builder: (_) => AddOrUpdateScreen(
                                 isUpdate: true, item: state.income),
                           ),
                         );

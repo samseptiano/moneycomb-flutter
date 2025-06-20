@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:money_comb/main.dart';
 import 'package:money_comb/ui/page/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -19,10 +18,11 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
+ Widget build(BuildContext context) {
+  return Scaffold(
+    body: Center(
+      child: Container(
+        margin: const EdgeInsets.all(32), // Add margin here
         child: SizedBox(
           child: LottieBuilder.asset(
             'assets/lottie/lottie_splashscreen.json',
@@ -31,6 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

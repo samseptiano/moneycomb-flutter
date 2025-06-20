@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_comb/ui/page/transaction_history_screen.dart';
 
-import 'add_or_update_page.dart';
+import 'add_or_update_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -30,7 +30,7 @@ class HomeScreen extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (c) => const AddOrUpdatePage()),
+            MaterialPageRoute(builder: (c) => const AddOrUpdateScreen()),
           );
         },
       ),

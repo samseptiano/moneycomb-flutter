@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_comb/bloc/bloc/expense/expense_bloc.dart';
 import 'package:money_comb/bloc/bloc/income/income_bloc.dart';
-import 'package:money_comb/ui/page/add_or_update_page.dart';
+import 'package:money_comb/ui/page/add_or_update_screen.dart';
 import 'package:money_comb/ui/page/splash_screen.dart';
 import 'package:money_comb/ui/tabs/expense_tab.dart';
 import 'package:money_comb/ui/tabs/income_tab.dart';

@@ -13,12 +13,12 @@ import 'package:money_comb/util/stringUtil.dart';
 
 import '../widgets/category_dropdown.dart';
 
-class AddOrUpdatePage extends StatefulWidget {
+class AddOrUpdateScreen extends StatefulWidget {
   final bool isUpdate;
   final dynamic item; // can be Expense or Income
   final DataType? initialType;
 
-  const AddOrUpdatePage({
+  const AddOrUpdateScreen({
     Key? key,
     this.isUpdate = false,
     this.item,
@@ -26,10 +26,10 @@ class AddOrUpdatePage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<AddOrUpdatePage> createState() => _AddOrUpdatePageState();
+  State<AddOrUpdateScreen> createState() => _AddOrUpdateScreenState();
 }
 
-class _AddOrUpdatePageState extends State<AddOrUpdatePage> {
+class _AddOrUpdateScreenState extends State<AddOrUpdateScreen> {
   final TextEditingController _title = TextEditingController();
   final TextEditingController _description = TextEditingController();
   final TextEditingController _nominal = TextEditingController();

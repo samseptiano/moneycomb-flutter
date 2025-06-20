@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import '../../bloc/bloc/expense/expense_bloc.dart';
 import '../../bloc/bloc/income/income_bloc.dart';
 import '../../util/stringUtil.dart';
-import '../page/details_page.dart';
+import '../page/detail_transaction_screen.dart';
 
 class TransactionList extends StatelessWidget {
   final List<dynamic> items;
@@ -51,13 +51,13 @@ class TransactionList extends StatelessWidget {
                 context.read<ExpenseBloc>().add(FetchSpecificExpense(id: item.id!));
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const DetailsPage(isExpense: true)),
+                  MaterialPageRoute(builder: (_) => const DetailTransactionScreen(isExpense: true)),
                 );
               } else {
                 context.read<IncomeBloc>().add(FetchSpecificIncome(id: item.id!));
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const DetailsPage(isExpense: false)),
+                  MaterialPageRoute(builder: (_) => const DetailTransactionScreen(isExpense: false)),
                 );
               }
             },
