@@ -10,7 +10,8 @@ class TransactionHistoryScreen extends StatefulWidget {
   const TransactionHistoryScreen({Key? key}) : super(key: key);
 
   @override
-  State<TransactionHistoryScreen> createState() => _TransactionHistoryScreenState();
+  State<TransactionHistoryScreen> createState() =>
+      _TransactionHistoryScreenState();
 }
 
 class _TransactionHistoryScreenState extends State<TransactionHistoryScreen>
@@ -23,8 +24,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen>
     _tabController = TabController(length: 2, vsync: this);
 
     // Dispatch events to fetch data on startup
-    context.read<ExpenseBloc>()
-    .add(const FetchExpenses());
+    context.read<ExpenseBloc>().add(const FetchExpenses());
     // ..add(const FetchTotalExpenses());
     context.read<IncomeBloc>().add(const FetchIncomes());
   }
@@ -42,8 +42,21 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen>
             Tab(text: 'Incomes'),
           ],
         ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+              context
+                  .read<ExpenseBloc>()
+                  .add(const FetchAllExpensesTotalExpensesByMonth());
+              context
+                  .read<IncomeBloc>()
+                  .add(const FetchAllIncomeTotalIncomeByMonth());
+            
+            Navigator.pop(context);
+          },
+        )
       ),
-            body: TabBarView(
+      body: TabBarView(
         controller: _tabController,
         children: const [
           // Expense tab
