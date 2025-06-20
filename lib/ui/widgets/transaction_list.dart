@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
 import '../../bloc/bloc/expense/expense_bloc.dart';
@@ -29,71 +30,34 @@ class TransactionList extends StatelessWidget {
       itemBuilder: (context, i) {
         final item = items[i];
 
-        return Dismissible(
+        return Slidable(
           key: Key('${item.id}-${isExpense ? 'expense' : 'income'}'),
-          direction: DismissDirection.endToStart,
-          background: Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 0),
-            alignment: Alignment.centerRight,
-            child: const Icon(Icons.delete, color: Colors.redAccent),
-          ),
-          confirmDismiss: (direction) async {
-            return await showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Confirm Delete'),
-                content: const Text(
-                    'Are you sure you want to delete this transaction?'),
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: const Text('Cancel')),
-                  TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text('Delete')),
-                ],
+          endActionPane: ActionPane(
+            motion: const DrawerMotion(),
+            extentRatio: 0.25,
+            children: [
+              SlidableAction(
+                onPressed: (_) => _confirmDelete(context, item.id),
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.red,
+                icon: Icons.delete,
+                label: 'Delete',
               ),
-            );
-          },
-          onDismissed: (direction) {
-            final scaffold = ScaffoldMessenger.of(context);
-
-            if (isExpense) {
-              final bloc = context.read<ExpenseBloc>();
-              bloc.add(DeleteExpense(id: item.id));
-              bloc.add(const FetchExpenses());
-              bloc.add(const FetchAllExpensesTotalExpensesByMonth());
-            } else {
-              final bloc = context.read<IncomeBloc>();
-              bloc.add(DeleteIncome(id: item.id));
-              bloc.add(const FetchIncomes());
-              bloc.add(const FetchAllIncomeTotalIncomeByMonth());
-            }
-
-            scaffold.showSnackBar(
-              const SnackBar(content: Text('Transaction deleted')),
-            );
-          },
+            ],
+          ),
           child: GestureDetector(
             onTap: () {
               if (isExpense) {
-                context
-                    .read<ExpenseBloc>()
-                    .add(FetchSpecificExpense(id: item.id!));
+                context.read<ExpenseBloc>().add(FetchSpecificExpense(id: item.id!));
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (_) => const DetailsPage(isExpense: true)),
+                  MaterialPageRoute(builder: (_) => const DetailsPage(isExpense: true)),
                 );
               } else {
-                context
-                    .read<IncomeBloc>()
-                    .add(FetchSpecificIncome(id: item.id!));
+                context.read<IncomeBloc>().add(FetchSpecificIncome(id: item.id!));
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (_) => const DetailsPage(isExpense: false)),
+                  MaterialPageRoute(builder: (_) => const DetailsPage(isExpense: false)),
                 );
               }
             },
@@ -103,19 +67,16 @@ class TransactionList extends StatelessWidget {
               color: isExpense ? Colors.redAccent : Colors.green,
               child: Column(
                 children: [
-                  // Top-right date
                   Padding(
                     padding: const EdgeInsets.only(right: 12.0, top: 8.0),
                     child: Align(
                       alignment: Alignment.topRight,
                       child: Text(
                         DateFormat('dd MMM yyyy hh:mm').format(item.createdAt),
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 11),
+                        style: const TextStyle(color: Colors.white70, fontSize: 11),
                       ),
                     ),
                   ),
-                  // Main content
                   ListTile(
                     title: Text(
                       item.title,
@@ -134,7 +95,6 @@ class TransactionList extends StatelessWidget {
                       style: const TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   ),
-                  // Bottom-right category
                   Padding(
                     padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),
                     child: Align(
@@ -158,5 +118,36 @@ class TransactionList extends StatelessWidget {
         );
       },
     );
+  }
+
+  void _confirmDelete(BuildContext context, int id) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Delete'),
+        content: const Text('Are you sure you want to delete this transaction?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+        ],
+      ),
+    );
+
+    if (shouldDelete == true) {
+      final scaffold = ScaffoldMessenger.of(context);
+      if (isExpense) {
+        final bloc = context.read<ExpenseBloc>();
+        bloc.add(DeleteExpense(id: id));
+        bloc.add(const FetchExpenses());
+        bloc.add(const FetchAllExpensesTotalExpensesByMonth());
+      } else {
+        final bloc = context.read<IncomeBloc>();
+        bloc.add(DeleteIncome(id: id));
+        bloc.add(const FetchIncomes());
+        bloc.add(const FetchAllIncomeTotalIncomeByMonth());
+      }
+
+      scaffold.showSnackBar(const SnackBar(content: Text('Transaction deleted')));
+    }
   }
 }
