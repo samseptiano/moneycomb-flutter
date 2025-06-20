@@ -6,10 +6,12 @@ import 'package:money_comb/bloc/bloc/expense/expense_bloc.dart';
 import 'package:money_comb/bloc/bloc/income/income_bloc.dart';
 import 'package:money_comb/constants/datatype.dart';
 import 'package:money_comb/constants/expenseCategory.dart';
-import 'package:money_comb/constants/IncomeCategory.dart';
+import 'package:money_comb/constants/incomeCategory.dart';
 import 'package:money_comb/models/expense.dart';
 import 'package:money_comb/models/income.dart';
 import 'package:money_comb/util/stringUtil.dart';
+
+import '../widgets/category_dropdown.dart';
 
 class AddOrUpdatePage extends StatefulWidget {
   final bool isUpdate;
@@ -65,7 +67,15 @@ class _AddOrUpdatePageState extends State<AddOrUpdatePage> {
               widget.isUpdate ? 'Update Expense/Income' : 'Add Expense/Income'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => {
+              context
+                  .read<IncomeBloc>()
+                  .add(const FetchAllIncomeTotalIncomeByMonth()),
+              context
+                  .read<ExpenseBloc>()
+                  .add(const FetchAllExpensesTotalExpensesByMonth()),
+              Navigator.pop(context)
+            },
           ),
         ),
         body: SingleChildScrollView(
@@ -90,9 +100,13 @@ class _AddOrUpdatePageState extends State<AddOrUpdatePage> {
                   const SizedBox(height: 16),
                   _buildDataTypeSelector(),
                   if (_selectedDataType == DataType.Expense)
-                    _buildExpenseCategoryDropdown(),
+                    CategoryDropdowns.buildExpenseCategoryDropdown(
+                        _selectedExpenseCategory,
+                        (p0) => {_selectedExpenseCategory = p0}),
                   if (_selectedDataType == DataType.Income)
-                    _buildIncomeCategoryDropdown(),
+                    CategoryDropdowns.buildIncomeCategoryDropdown(
+                        _selectedIncomeCategory,
+                        (p0) => {_selectedIncomeCategory = p0}),
                   const SizedBox(height: 24),
                   _buildSubmitButton(),
                 ],
@@ -105,71 +119,71 @@ class _AddOrUpdatePageState extends State<AddOrUpdatePage> {
   }
 
   Widget _buildTextField(
-  String label,
-  TextEditingController controller,
-  IconData icon, {
-  int maxLines = 1,
-  int? maxLength,
-  bool isNumber = false,
-  bool enableThousandSeparator = false,
-}) {
-  final formatter = NumberFormat('#,###');
+    String label,
+    TextEditingController controller,
+    IconData icon, {
+    int maxLines = 1,
+    int? maxLength,
+    bool isNumber = false,
+    bool enableThousandSeparator = false,
+  }) {
+    final formatter = NumberFormat('#,###');
 
-  if (isNumber && enableThousandSeparator) {
-    controller.addListener(() {
-      final rawText = controller.text.replaceAll(',', '');
+    if (isNumber && enableThousandSeparator) {
+      controller.addListener(() {
+        final rawText = controller.text.replaceAll(',', '');
 
-      if (rawText.isEmpty) return;
+        if (rawText.isEmpty) return;
 
-      final number = int.tryParse(rawText);
-      if (number == null) return;
+        final number = int.tryParse(rawText);
+        if (number == null) return;
 
-      // Clamp to max allowed digits
-      if (number > 999999999999) {
-        controller.text = '999,999,999,999';
-        controller.selection = TextSelection.collapsed(
-          offset: controller.text.length,
-        );
-        return;
-      }
+        // Clamp to max allowed digits
+        if (number > 999999999999) {
+          controller.text = '999,999,999,999';
+          controller.selection = TextSelection.collapsed(
+            offset: controller.text.length,
+          );
+          return;
+        }
 
-      final newText = formatter.format(number);
-      if (controller.text != newText) {
-        final offset = newText.length;
-        controller.value = TextEditingValue(
-          text: newText,
-          selection: TextSelection.collapsed(offset: offset),
-        );
-      }
-    });
-  }
+        final newText = formatter.format(number);
+        if (controller.text != newText) {
+          final offset = newText.length;
+          controller.value = TextEditingValue(
+            text: newText,
+            selection: TextSelection.collapsed(offset: offset),
+          );
+        }
+      });
+    }
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        label,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-      ),
-      const SizedBox(height: 8),
-      TextFormField(
-        controller: controller,
-        maxLines: maxLines,
-        maxLength: isNumber ? 15 : maxLength, // allow formatted length
-        inputFormatters:
-            isNumber ? [FilteringTextInputFormatter.digitsOnly] : [],
-        keyboardType: isNumber
-            ? TextInputType.number
-            : (maxLines > 1 ? TextInputType.multiline : TextInputType.text),
-        decoration: InputDecoration(
-          hintText: "Enter ${label.toLowerCase()}",
-          prefixIcon: Icon(icon),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
-      ),
-    ],
-  );
-}
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          maxLines: maxLines,
+          maxLength: isNumber ? 15 : maxLength, // allow formatted length
+          inputFormatters:
+              isNumber ? [FilteringTextInputFormatter.digitsOnly] : [],
+          keyboardType: isNumber
+              ? TextInputType.number
+              : (maxLines > 1 ? TextInputType.multiline : TextInputType.text),
+          decoration: InputDecoration(
+            hintText: "Enter ${label.toLowerCase()}",
+            prefixIcon: Icon(icon),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+      ],
+    );
+  }
 
   Widget _buildDataTypeSelector() {
     return Row(
@@ -198,40 +212,6 @@ class _AddOrUpdatePageState extends State<AddOrUpdatePage> {
     );
   }
 
-  Widget _buildExpenseCategoryDropdown() {
-    return DropdownButtonFormField<ExpenseCategory>(
-      value: _selectedExpenseCategory,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-      ),
-      items: ExpenseCategory.values
-          .map((e) => DropdownMenuItem(
-                value: e,
-                child: Text(StringUtil.formatCamelCase(e.name)),
-              ))
-          .toList(),
-      onChanged: (value) => setState(() => _selectedExpenseCategory = value),
-    );
-  }
-
-  Widget _buildIncomeCategoryDropdown() {
-    return DropdownButtonFormField<IncomeCategory>(
-      value: _selectedIncomeCategory,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-      ),
-      items: IncomeCategory.values
-          .map((e) => DropdownMenuItem(
-                value: e,
-                child: Text(StringUtil.formatCamelCase(e.name)),
-              ))
-          .toList(),
-      onChanged: (value) => setState(() => _selectedIncomeCategory = value),
-    );
-  }
-
   Widget _buildSubmitButton() {
     return SizedBox(
       width: double.infinity,
@@ -247,7 +227,8 @@ class _AddOrUpdatePageState extends State<AddOrUpdatePage> {
           if (_title.text.isNotEmpty &&
               _description.text.isNotEmpty &&
               _nominal.text.isNotEmpty) {
-            final nominal = double.tryParse(_nominal.text.replaceAll(",", "")) ?? 0;
+            final nominal =
+                double.tryParse(_nominal.text.replaceAll(",", "")) ?? 0;
 
             if (_selectedDataType == DataType.Expense) {
               final expense = Expense(

@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:money_comb/constants/IncomeCategory.dart';
+import 'package:money_comb/constants/incomeCategory.dart';
 import '../../../models/income.dart';
 import '../../../services/database_service.dart';
 part 'income_event.dart';

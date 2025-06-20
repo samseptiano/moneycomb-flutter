@@ -1,4 +1,4 @@
-import 'package:money_comb/constants/IncomeCategory.dart';
+import 'package:money_comb/constants/incomeCategory.dart';
 
 const String incomeTable = 'income';
 
