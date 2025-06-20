@@ -26,18 +26,12 @@ class DisplayExpenses extends ExpenseState {
   List<Object> get props => [expense];
 }
 
+class DisplayExpensesPaging extends ExpenseState {
+  final List<Expense> expense;
 
-class DisplayExpensesWithTotal extends ExpenseState {
-  final List<Expense> expenses;
-  final double total;
-
-  const DisplayExpensesWithTotal({
-    required this.expenses,
-    required this.total,
-  });
-
+  const DisplayExpensesPaging({required this.expense});
   @override
-  List<Object> get props => [expenses, total];
+  List<Object> get props => [expense];
 }
 
 class DisplayExpensesWithTotalYear extends ExpenseState {

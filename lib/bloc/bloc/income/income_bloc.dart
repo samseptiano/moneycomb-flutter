@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:money_comb/constants/incomeCategory.dart';
+import '../../../constants/constants.dart';
 import '../../../models/income.dart';
 import '../../../services/database_service.dart';
 part 'income_event.dart';
@@ -9,6 +10,10 @@ part 'income_state.dart';
 class IncomeBloc extends Bloc<IncomeEvent, IncomeState> {
   IncomeBloc() : super(IncomeInitial()) {
     List<Income> incomes = [];
+
+    int _currentOffset = 0;
+    final int _pageSize = Constants.transactionHistoryPageSize;
+
     on<AddIncome>((event, emit) async {
       await DatabaseService.instance.createIncome(
         Income(
@@ -32,6 +37,28 @@ class IncomeBloc extends Bloc<IncomeEvent, IncomeState> {
     on<FetchIncomes>((event, emit) async {
       incomes = await DatabaseService.instance.readAllIncomes();
       emit(DisplayIncomes(income: incomes));
+    });
+
+    on<FetchIncomesPaging>((event, emit) async {
+      _currentOffset = 0;
+      incomes = await DatabaseService.instance
+          .readAllIncomesPaging(search: event.query, limit: _pageSize, offset: _currentOffset);
+      emit(DisplayIncomesPaging(income: incomes));
+    });
+
+    on<LoadMoreIncomes>((event, emit) async {
+      if (state is DisplayIncomesPaging) {
+        final currentState = state as DisplayIncomesPaging;
+        _currentOffset += _pageSize;
+        final moreIncomes = incomes = await DatabaseService.instance
+            .readAllIncomesPaging(search: event.query, limit: _pageSize, offset: _currentOffset);
+
+        // If no more data, return same state
+        if (moreIncomes.isEmpty) return;
+
+        final updatedIncomes = [...currentState.income, ...moreIncomes];
+        emit(DisplayIncomesPaging(income: updatedIncomes));
+      }
     });
 
     on<FetchSpecificIncome>((event, emit) async {

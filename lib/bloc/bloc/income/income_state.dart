@@ -25,6 +25,14 @@ class DisplayIncomes extends IncomeState {
   List<Object> get props => [income];
 }
 
+class DisplayIncomesPaging extends IncomeState {
+  final List<Income> income;
+
+  const DisplayIncomesPaging({required this.income});
+  @override
+  List<Object> get props => [income];
+}
+
 class DisplayIncomesWithTotal extends IncomeState {
   final List<Income> incomes;
   final double total;

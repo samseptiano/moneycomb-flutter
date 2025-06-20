@@ -70,10 +70,10 @@ class _AddOrUpdateScreenState extends State<AddOrUpdateScreen> {
             onPressed: () => {
               context
                   .read<IncomeBloc>()
-                  .add(const FetchAllIncomeTotalIncomeByMonth()),
+                  .add(const FetchAllIncomeTotalIncomeByMonthAndYear()),
               context
                   .read<ExpenseBloc>()
-                  .add(const FetchAllExpensesTotalExpensesByMonth()),
+                  .add(const FetchAllExpensesTotalExpensesByMonthAndYear()),
               Navigator.pop(context)
             },
           ),
@@ -260,9 +260,14 @@ class _AddOrUpdateScreenState extends State<AddOrUpdateScreen> {
                             updatedAt: DateTime.now(),
                           ),
                   );
-              context
-                  .read<ExpenseBloc>()
-                  .add(const FetchAllExpensesTotalExpensesByMonth());
+
+              if (widget.isUpdate) {
+                context.read<ExpenseBloc>().add(const FetchExpensesPaging(""));
+              } else {
+                context
+                    .read<ExpenseBloc>()
+                    .add(const FetchAllExpensesTotalExpensesByMonthAndYear());
+              }
             } else {
               final income = Income(
                 id: widget.isUpdate ? widget.item.id : null,
@@ -294,9 +299,13 @@ class _AddOrUpdateScreenState extends State<AddOrUpdateScreen> {
                           ),
                   );
 
-              context
-                  .read<IncomeBloc>()
-                  .add(const FetchAllIncomeTotalIncomeByMonth());
+              if (widget.isUpdate) {
+                context.read<IncomeBloc>().add(const FetchIncomesPaging(""));
+              } else {
+                context
+                    .read<IncomeBloc>()
+                    .add(const FetchAllIncomeTotalIncomeByMonthAndYear());
+              }
             }
 
             ScaffoldMessenger.of(context).showSnackBar(
@@ -306,7 +315,8 @@ class _AddOrUpdateScreenState extends State<AddOrUpdateScreen> {
                       : 'Added successfully')),
             );
 
-            Navigator.pop(context);
+            Navigator.pop(context); // First pop
+            Navigator.pop(context); // Second pop
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(

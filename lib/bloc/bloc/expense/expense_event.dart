@@ -66,20 +66,31 @@ class FetchAllExpensesTotalExpensesByMonthAndYear extends ExpenseEvent {
   List<Object?> get props => [];
 }
 
-// Fetch FetchAllExpensesTotalExpensesByMonth Event
-class FetchAllExpensesTotalExpensesByMonth extends ExpenseEvent {
-  const FetchAllExpensesTotalExpensesByMonth();
-
-  @override
-  List<Object?> get props => [];
-}
-
 // Fetch All Expenses Event
 class FetchExpenses extends ExpenseEvent {
   const FetchExpenses();
 
   @override
   List<Object?> get props => [];
+}
+
+// Fetch All Expenses with paging Event
+class FetchExpensesPaging extends ExpenseEvent {
+  final String query;
+
+  const FetchExpensesPaging(this.query);
+
+  @override
+  List<Object?> get props => [query];
+}
+
+class LoadMoreExpenses extends ExpenseEvent {
+  final String query;
+
+  const LoadMoreExpenses(this.query);
+
+  @override
+  List<Object?> get props => [query];
 }
 
 // Fetch Specific Expense by ID

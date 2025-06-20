@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Constants {
+    static const int transactionHistoryPageSize = 20;
+
   static const String addTodo = 'Add Todo';
   static const Color primaryColor = Colors.black87;
   static ButtonStyle customButtonStyle = ElevatedButton.styleFrom(

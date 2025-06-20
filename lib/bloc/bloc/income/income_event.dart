@@ -82,6 +82,25 @@ class FetchIncomes extends IncomeEvent {
   List<Object?> get props => [];
 }
 
+
+class FetchIncomesPaging extends IncomeEvent {
+    final String query;
+
+  const FetchIncomesPaging(this.query);
+
+  @override
+  List<Object?> get props => [query];
+}
+
+class LoadMoreIncomes extends IncomeEvent {
+    final String query;
+
+  const LoadMoreIncomes(this.query);
+  
+  @override
+  List<Object?> get props => [query];
+}
+
 // Fetch Specific Income by ID
 class FetchSpecificIncome extends IncomeEvent {
   final int id;

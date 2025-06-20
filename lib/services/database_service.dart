@@ -5,6 +5,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:money_comb/models/expense.dart';
 import 'package:money_comb/models/income.dart';
 
+import '../constants/constants.dart';
+
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._init();
   static Database? _database;
@@ -97,19 +99,18 @@ class DatabaseService {
   }
 
   Future<double> readTotalExpenseByCurrentYear() async {
-  final db = await instance.database;
+    final db = await instance.database;
 
-  final result = await db.rawQuery('''
+    final result = await db.rawQuery('''
     SELECT SUM(${ExpenseFields.nominal}) as total
     FROM $expenseTable
     WHERE fgActive = 1
       AND strftime('%Y', createdAt) = strftime('%Y', 'now')
   ''');
 
-  final total = result.first['total'];
-  return (total is num) ? total.toDouble() : 0.0;
-}
-
+    final total = result.first['total'];
+    return (total is num) ? total.toDouble() : 0.0;
+  }
 
   Future<double> readTotalIncome() async {
     final db = await instance.database;
@@ -135,7 +136,7 @@ class DatabaseService {
     return (total is num) ? total.toDouble() : 0.0;
   }
 
-    Future<double> readTotalIncomeByCurrentYear() async {
+  Future<double> readTotalIncomeByCurrentYear() async {
     final db = await instance.database;
 
     final result = await db.rawQuery('''
@@ -183,6 +184,40 @@ class DatabaseService {
     }
   }
 
+  Future<List<Expense>> readAllExpensesPaging({
+    String search = "",
+    int limit = Constants.transactionHistoryPageSize,
+    int offset = 0,
+  }) async {
+    final db = await instance.database;
+    const orderBy = '${ExpenseFields.createdAt} DESC';
+
+    String where = '${ExpenseFields.fgActive} = 1';
+    List<String> whereArgs = [];
+
+    if (search.isNotEmpty) {
+      where += ' AND ('
+          '${ExpenseFields.title} LIKE ? OR '
+          '${ExpenseFields.description} LIKE ? OR '
+          '${ExpenseFields.nominal} LIKE ? OR '
+          '${ExpenseFields.category} LIKE ?'
+          ')';
+      final keyword = '%$search%';
+      whereArgs.addAll([keyword, keyword, keyword, keyword]);
+    }
+
+    final result = await db.query(
+      expenseTable,
+      where: where,
+      whereArgs: whereArgs,
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy,
+    );
+
+    return result.map((json) => Expense.fromJson(json)).toList();
+  }
+
   Future<List<Expense>> readAllExpenses() async {
     final db = await instance.database;
     const orderBy = '${ExpenseFields.createdAt} DESC';
@@ -205,6 +240,40 @@ class DatabaseService {
       incomeTable,
       where: '${IncomeFields.fgActive} = ?',
       whereArgs: [1], // 1 represents true in SQLite
+      orderBy: orderBy,
+    );
+
+    return result.map((json) => Income.fromJson(json)).toList();
+  }
+
+   Future<List<Income>> readAllIncomesPaging({
+    String search = "",
+    int limit = Constants.transactionHistoryPageSize,
+    int offset = 0,
+  }) async {
+    final db = await instance.database;
+    const orderBy = '${IncomeFields.createdAt} DESC';
+
+    String where = '${IncomeFields.fgActive} = 1';
+    List<String> whereArgs = [];
+
+    if (search.isNotEmpty) {
+      where += ' AND ('
+          '${IncomeFields.title} LIKE ? OR '
+          '${IncomeFields.description} LIKE ? OR '
+          '${IncomeFields.nominal} LIKE ? OR '
+          '${IncomeFields.category} LIKE ?'
+          ')';
+      final keyword = '%$search%';
+      whereArgs.addAll([keyword, keyword, keyword, keyword]);
+    }
+
+    final result = await db.query(
+      expenseTable,
+      where: where,
+      whereArgs: whereArgs,
+      limit: limit,
+      offset: offset,
       orderBy: orderBy,
     );
 

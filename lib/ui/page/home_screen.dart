@@ -41,7 +41,9 @@ class _HomeScreenState extends State<HomeScreen> {
         .read<ExpenseBloc>()
         .add(const FetchAllExpensesTotalExpensesByMonthAndYear());
 
-    context.read<IncomeBloc>().add(const FetchAllIncomeTotalIncomeByMonthAndYear());
+    context
+        .read<IncomeBloc>()
+        .add(const FetchAllIncomeTotalIncomeByMonthAndYear());
   }
 
   @override
@@ -72,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   isExpense: false,
                 );
               } else {
-                return const SizedBox(height: 10); // Reserve space
+                return const SizedBox(height: 100); // Reserve space
               }
             },
           ),
@@ -107,8 +109,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 16),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 onTap: item.onTap,
                 leading: Icon(item.icon, size: 35, color: Colors.blue),
                 title: Text(

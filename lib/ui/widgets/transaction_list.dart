@@ -11,11 +11,13 @@ import '../page/detail_transaction_screen.dart';
 class TransactionList extends StatelessWidget {
   final List<dynamic> items;
   final bool isExpense;
+  final ScrollController? controller;
 
   const TransactionList({
     Key? key,
     required this.items,
     required this.isExpense,
+    this.controller,
   }) : super(key: key);
 
   @override
@@ -25,6 +27,7 @@ class TransactionList extends StatelessWidget {
     }
 
     return ListView.builder(
+      controller: controller,
       padding: const EdgeInsets.all(8),
       itemCount: items.length,
       itemBuilder: (context, i) {
@@ -139,12 +142,12 @@ class TransactionList extends StatelessWidget {
         final bloc = context.read<ExpenseBloc>();
         bloc.add(DeleteExpense(id: id));
         bloc.add(const FetchExpenses());
-        bloc.add(const FetchAllExpensesTotalExpensesByMonth());
+        bloc.add(const FetchExpensesPaging(""));
       } else {
         final bloc = context.read<IncomeBloc>();
         bloc.add(DeleteIncome(id: id));
         bloc.add(const FetchIncomes());
-        bloc.add(const FetchAllIncomeTotalIncomeByMonth());
+        bloc.add(const FetchIncomesPaging(""));
       }
 
       scaffold.showSnackBar(const SnackBar(content: Text('Transaction deleted')));

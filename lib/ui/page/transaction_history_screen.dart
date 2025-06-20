@@ -24,9 +24,9 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen>
     _tabController = TabController(length: 2, vsync: this);
 
     // Dispatch events to fetch data on startup
-    context.read<ExpenseBloc>().add(const FetchExpenses());
+    context.read<ExpenseBloc>().add(const FetchExpensesPaging(""));
     // ..add(const FetchTotalExpenses());
-    context.read<IncomeBloc>().add(const FetchIncomes());
+    context.read<IncomeBloc>().add(const FetchIncomesPaging(""));
   }
 
   @override

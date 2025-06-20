@@ -28,11 +28,11 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
             if (widget.isExpense) {
               context
                   .read<ExpenseBloc>()
-                  .add(const FetchAllExpensesTotalExpensesByMonth());
+                  .add(const FetchExpensesPaging(""));
             } else {
               context
                   .read<IncomeBloc>()
-                  .add(const FetchAllIncomeTotalIncomeByMonth());
+                  .add(const FetchIncomesPaging(""));
             }
             Navigator.pop(context);
           },
