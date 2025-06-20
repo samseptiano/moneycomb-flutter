@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     context
         .read<ExpenseBloc>()
         .add(const FetchAllExpensesTotalExpensesByMonth());
-    // ..add(const FetchTotalExpenses());
+
     context.read<IncomeBloc>().add(const FetchAllIncomeTotalIncomeByMonth());
   }
 
@@ -58,73 +58,72 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       body: ListView(
-  padding: const EdgeInsets.all(16),
-  children: [
-    // Income BLoC
-    BlocBuilder<IncomeBloc, IncomeState>(
-      builder: (context, state) {
-        if (state is DisplayIncomesWithTotal) {
-          return TotalCardHome(
-            title: 'This Month Income',
-            subTitle: 'YTD Income',
-            amountMonth: state.total,
-            amountYtd: state.total,
-            isExpense: false,
-          );
-        } else {
-          return const SizedBox(); // or a loading/skeleton widget
-        }
-      },
-    ),
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Income BLoC
+          BlocBuilder<IncomeBloc, IncomeState>(
+            builder: (context, state) {
+              if (state is DisplayIncomesWithTotal) {
+                return TotalCardHome(
+                  title: 'This Month Income',
+                  subTitle: 'YTD Income',
+                  amountMonth: state.total,
+                  amountYtd: state.total,
+                  isExpense: false,
+                );
+              } else {
+                return const SizedBox(height: 100); // Reserve space
+              }
+            },
+          ),
 
-    const SizedBox(height: 10),
+          const SizedBox(height: 10),
 
-    // Expense BLoC
-    BlocBuilder<ExpenseBloc, ExpenseState>(
-      builder: (context, state) {
-        if (state is DisplayExpensesWithTotal) {
-          return TotalCardHome(
-            title: 'This Month Expense',
-            subTitle: 'YTD Expense',
-            amountMonth: state.total,
-            amountYtd: state.total,
-            isExpense: true,
-          );
-        } else {
-          return const SizedBox(); // or a loading/skeleton widget
-        }
-      },
-    ),
+          // Expense BLoC
+          BlocBuilder<ExpenseBloc, ExpenseState>(
+            builder: (context, state) {
+              if (state is DisplayExpensesWithTotal) {
+                return TotalCardHome(
+                  title: 'This Month Expense',
+                  subTitle: 'YTD Expense',
+                  amountMonth: state.total,
+                  amountYtd: state.total,
+                  isExpense: true,
+                );
+              } else {
+                return const SizedBox(height: 100); // Reserve space
+              }
+            },
+          ),
 
-    const SizedBox(height: 24),
+          const SizedBox(height: 24),
 
-    // Menu List
-    ...items.map(
-      (item) => Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: Colors.blue.shade100,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: ListTile(
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          onTap: item.onTap,
-          leading: Icon(item.icon, size: 50, color: Colors.blue),
-          title: Text(
-            item.label,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
+          // Menu List
+          ...items.map(
+            (item) => Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 16),
+                onTap: item.onTap,
+                leading: Icon(item.icon, size: 50, color: Colors.blue),
+                title: Text(
+                  item.label,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 30),
+              ),
             ),
           ),
-          trailing: const Icon(Icons.arrow_forward_ios, size: 30),
-        ),
+        ],
       ),
-    ),
-  ],
-),
-
     );
   }
 }
