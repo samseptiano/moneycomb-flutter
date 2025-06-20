@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:money_comb/bloc/bloc/expense/expense_bloc.dart';
 import 'package:money_comb/bloc/bloc/income/income_bloc.dart';
 import 'package:money_comb/constants/datatype.dart';
@@ -84,7 +86,7 @@ class _AddOrUpdatePageState extends State<AddOrUpdatePage> {
                       maxLines: 3, maxLength: 100),
                   const SizedBox(height: 16),
                   _buildTextField("Nominal", _nominal, Icons.currency_exchange,
-                      isNumber: true),
+                      isNumber: true, enableThousandSeparator: true),
                   const SizedBox(height: 16),
                   _buildDataTypeSelector(),
                   if (_selectedDataType == DataType.Expense)
@@ -102,14 +104,46 @@ class _AddOrUpdatePageState extends State<AddOrUpdatePage> {
     );
   }
 
-Widget _buildTextField(
+  Widget _buildTextField(
   String label,
   TextEditingController controller,
   IconData icon, {
   int maxLines = 1,
   int? maxLength,
   bool isNumber = false,
+  bool enableThousandSeparator = false,
 }) {
+  final formatter = NumberFormat('#,###');
+
+  if (isNumber && enableThousandSeparator) {
+    controller.addListener(() {
+      final rawText = controller.text.replaceAll(',', '');
+
+      if (rawText.isEmpty) return;
+
+      final number = int.tryParse(rawText);
+      if (number == null) return;
+
+      // Clamp to max allowed digits
+      if (number > 999999999999) {
+        controller.text = '999,999,999,999';
+        controller.selection = TextSelection.collapsed(
+          offset: controller.text.length,
+        );
+        return;
+      }
+
+      final newText = formatter.format(number);
+      if (controller.text != newText) {
+        final offset = newText.length;
+        controller.value = TextEditingValue(
+          text: newText,
+          selection: TextSelection.collapsed(offset: offset),
+        );
+      }
+    });
+  }
+
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -121,7 +155,9 @@ Widget _buildTextField(
       TextFormField(
         controller: controller,
         maxLines: maxLines,
-        maxLength: maxLength,
+        maxLength: isNumber ? 15 : maxLength, // allow formatted length
+        inputFormatters:
+            isNumber ? [FilteringTextInputFormatter.digitsOnly] : [],
         keyboardType: isNumber
             ? TextInputType.number
             : (maxLines > 1 ? TextInputType.multiline : TextInputType.text),
@@ -134,7 +170,6 @@ Widget _buildTextField(
     ],
   );
 }
-
 
   Widget _buildDataTypeSelector() {
     return Row(
@@ -209,8 +244,10 @@ Widget _buildTextField(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         onPressed: () {
-          if (_title.text.isNotEmpty && _description.text.isNotEmpty && _nominal.text.isNotEmpty) {
-            final nominal = double.tryParse(_nominal.text) ?? 0;
+          if (_title.text.isNotEmpty &&
+              _description.text.isNotEmpty &&
+              _nominal.text.isNotEmpty) {
+            final nominal = double.tryParse(_nominal.text.replaceAll(",", "")) ?? 0;
 
             if (_selectedDataType == DataType.Expense) {
               final expense = Expense(
@@ -242,8 +279,9 @@ Widget _buildTextField(
                             updatedAt: DateTime.now(),
                           ),
                   );
-                        context.read<ExpenseBloc>().add(const FetchAllExpensesTotalExpensesByMonth());
-
+              context
+                  .read<ExpenseBloc>()
+                  .add(const FetchAllExpensesTotalExpensesByMonth());
             } else {
               final income = Income(
                 id: widget.isUpdate ? widget.item.id : null,
@@ -275,7 +313,9 @@ Widget _buildTextField(
                           ),
                   );
 
-      context.read<IncomeBloc>().add(const FetchAllIncomeTotalIncomeByMonth());
+              context
+                  .read<IncomeBloc>()
+                  .add(const FetchAllIncomeTotalIncomeByMonth());
             }
 
             ScaffoldMessenger.of(context).showSnackBar(
@@ -289,7 +329,8 @@ Widget _buildTextField(
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                  content: Text("Title, description, nominal must not be empty")),
+                  content:
+                      Text("Title, description, nominal must not be empty")),
             );
           }
         },
