@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_comb/bloc/bloc/expense/expense_bloc.dart';
 import 'package:money_comb/bloc/bloc/income/income_bloc.dart';
 import 'package:money_comb/ui/page/add_or_update_page.dart';
-import 'package:money_comb/ui/splash_screen/splash_screen.dart';
+import 'package:money_comb/ui/page/splash_screen.dart';
 import 'package:money_comb/ui/tabs/expense_tab.dart';
 import 'package:money_comb/ui/tabs/income_tab.dart';
 
@@ -33,67 +33,4 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class SqFliteDemo extends StatefulWidget {
-  const SqFliteDemo({Key? key}) : super(key: key);
 
-  @override
-  State<SqFliteDemo> createState() => _SqFliteDemoState();
-}
-
-class _SqFliteDemoState extends State<SqFliteDemo>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-
-    // Dispatch events to fetch data on startup
-    context.read<ExpenseBloc>()
-    .add(const FetchExpenses());
-    // ..add(const FetchTotalExpenses());
-    context.read<IncomeBloc>().add(const FetchIncomes());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('MoneyComb'),
-        centerTitle: true,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Expenses'),
-            Tab(text: 'Incomes'),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add, color: Colors.black87),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (c) => const AddOrUpdatePage()),
-          );
-        },
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const [
-          // Expense tab
-          ExpenseTab(),
-          // Income tab
-          IncomeTab(),
-        ],
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-}
