@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/bloc/expense/expense_bloc.dart';
 import '../../bloc/bloc/income/income_bloc.dart';
+import '../../constants/constants.dart';
 import '../tabs/expense_tab.dart';
 import '../tabs/income_tab.dart';
 
@@ -24,38 +25,41 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen>
     _tabController = TabController(length: 2, vsync: this);
 
     // Dispatch events to fetch data on startup
-    context.read<ExpenseBloc>().add(const FetchExpensesPaging(""));
+    context.read<ExpenseBloc>().add(FetchExpensesPaging(
+        "",
+        ExpenseOrderBy.createdAt.toString().split('.').last,
+        OrderDir.DESC.toString().split('.').last));
     // ..add(const FetchTotalExpenses());
-    context.read<IncomeBloc>().add(const FetchIncomesPaging(""));
+    context.read<IncomeBloc>().add(FetchIncomesPaging("", IncomeOrderBy.createdAt.toString().split('.').last,
+                  OrderDir.DESC.toString().split('.').last));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('History'),
-        centerTitle: true,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Expenses'),
-            Tab(text: 'Incomes'),
-          ],
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
+          title: const Text('History'),
+          centerTitle: true,
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'Expenses'),
+              Tab(text: 'Incomes'),
+            ],
+          ),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
               context
                   .read<ExpenseBloc>()
                   .add(const FetchAllExpensesTotalExpensesByMonthAndYear());
               context
                   .read<IncomeBloc>()
                   .add(const FetchAllIncomeTotalIncomeByMonthAndYear());
-            
-            Navigator.pop(context);
-          },
-        )
-      ),
+
+              Navigator.pop(context);
+            },
+          )),
       body: TabBarView(
         controller: _tabController,
         children: const [

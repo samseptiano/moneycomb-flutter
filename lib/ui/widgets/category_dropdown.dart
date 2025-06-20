@@ -17,7 +17,7 @@ class CategoryDropdowns {
     return DropdownButtonFormField<ExpenseCategory>(
       value: selectedCategory,
       decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12),
       ),
       items: sortedCategories
@@ -43,7 +43,7 @@ class CategoryDropdowns {
     return DropdownButtonFormField<IncomeCategory>(
       value: selectedCategory,
       decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12),
       ),
       items: sortedCategories

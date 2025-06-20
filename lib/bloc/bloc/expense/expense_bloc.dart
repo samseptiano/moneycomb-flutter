@@ -43,7 +43,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
         _currentOffset = 0; 
         
       expenses = await DatabaseService.instance
-          .readAllExpensesPaging(search:event.query, limit: _pageSize, offset: _currentOffset);
+          .readAllExpensesPaging(search:event.query, limit: _pageSize, offset: _currentOffset, orderBy: event.orderBy, orderDir: event.orderDir);
       emit(DisplayExpensesPaging(expense: expenses));
     });
 
@@ -52,7 +52,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
         final currentState = state as DisplayExpensesPaging;
         _currentOffset += _pageSize;
         final moreExpenses = expenses = await DatabaseService.instance
-          .readAllExpensesPaging(search:event.query, limit: _pageSize, offset: _currentOffset);
+          .readAllExpensesPaging(search:event.query, limit: _pageSize, offset: _currentOffset, orderBy: event.orderBy, orderDir: event.orderDir);
         // If no more data, return same state
         if (moreExpenses.isEmpty) return;
 

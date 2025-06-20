@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_comb/bloc/bloc/expense/expense_bloc.dart';
 import 'package:money_comb/bloc/bloc/income/income_bloc.dart';
+import 'package:money_comb/constants/constants.dart';
 import 'package:money_comb/ui/page/add_or_update_screen.dart';
 import 'package:money_comb/ui/widgets/detail_content.dart';
 
 class DetailTransactionScreen extends StatefulWidget {
   final bool isExpense;
 
-  const DetailTransactionScreen({Key? key, required this.isExpense}) : super(key: key);
+  const DetailTransactionScreen({Key? key, required this.isExpense})
+      : super(key: key);
 
   @override
-  State<DetailTransactionScreen> createState() => _DetailTransactionScreenState();
+  State<DetailTransactionScreen> createState() =>
+      _DetailTransactionScreenState();
 }
 
 class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
@@ -26,13 +29,13 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (widget.isExpense) {
-              context
-                  .read<ExpenseBloc>()
-                  .add(const FetchExpensesPaging(""));
+              context.read<ExpenseBloc>().add(FetchExpensesPaging(
+                  "",
+                  ExpenseOrderBy.createdAt.toString().split('.').last,
+                  OrderDir.DESC.toString().split('.').last));
             } else {
-              context
-                  .read<IncomeBloc>()
-                  .add(const FetchIncomesPaging(""));
+              context.read<IncomeBloc>().add(FetchIncomesPaging("", IncomeOrderBy.createdAt.toString().split('.').last,
+                  OrderDir.DESC.toString().split('.').last));
             }
             Navigator.pop(context);
           },
@@ -52,7 +55,7 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (_) => AddOrUpdateScreen(
-                                isUpdate: true, item: state.expense),
+                                isUpdate: true, isExpense: widget.isExpense, item: state.expense),
                           ),
                         );
                       },

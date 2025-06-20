@@ -4,8 +4,18 @@ const String expenseTable = 'expense';
 
 class ExpenseFields {
   static final List<String> values = [
-    id, isImportant, number, title, description, nominal, category,
-    fgActive, createdBy, createdAt, updatedBy, updatedAt
+    id,
+    isImportant,
+    number,
+    title,
+    description,
+    nominal,
+    category,
+    fgActive,
+    createdBy,
+    createdAt,
+    updatedBy,
+    updatedAt
   ];
 
   static const String id = '_id';

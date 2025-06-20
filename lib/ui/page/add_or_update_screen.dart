@@ -11,16 +11,19 @@ import 'package:money_comb/models/expense.dart';
 import 'package:money_comb/models/income.dart';
 import 'package:money_comb/util/stringUtil.dart';
 
+import '../../constants/constants.dart';
 import '../widgets/category_dropdown.dart';
 
 class AddOrUpdateScreen extends StatefulWidget {
   final bool isUpdate;
+  final bool isExpense;
   final dynamic item; // can be Expense or Income
   final DataType? initialType;
 
   const AddOrUpdateScreen({
     Key? key,
     this.isUpdate = false,
+    this.isExpense = true,
     this.item,
     this.initialType,
   }) : super(key: key);
@@ -68,13 +71,32 @@ class _AddOrUpdateScreenState extends State<AddOrUpdateScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => {
-              context
-                  .read<IncomeBloc>()
-                  .add(const FetchAllIncomeTotalIncomeByMonthAndYear()),
-              context
-                  .read<ExpenseBloc>()
-                  .add(const FetchAllExpensesTotalExpensesByMonthAndYear()),
-              Navigator.pop(context)
+              if (widget.isUpdate)
+                {
+                  if (widget.item is Income)
+                    {
+                      context
+                          .read<IncomeBloc>()
+                          .add(FetchSpecificIncome(id: widget.item.id!)),
+                    }
+                  else
+                    {
+                      context
+                          .read<ExpenseBloc>()
+                          .add(FetchSpecificExpense(id: widget.item.id)),
+                    },
+                  Navigator.pop(context)
+                }
+              else
+                {
+                  context
+                      .read<IncomeBloc>()
+                      .add(const FetchAllIncomeTotalIncomeByMonthAndYear()),
+                  context
+                      .read<ExpenseBloc>()
+                      .add(const FetchAllExpensesTotalExpensesByMonthAndYear()),
+                  Navigator.pop(context)
+                }
             },
           ),
         ),
@@ -178,7 +200,7 @@ class _AddOrUpdateScreenState extends State<AddOrUpdateScreen> {
           decoration: InputDecoration(
             hintText: "Enter ${label.toLowerCase()}",
             prefixIcon: Icon(icon),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           ),
         ),
       ],
@@ -221,7 +243,7 @@ class _AddOrUpdateScreenState extends State<AddOrUpdateScreen> {
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
         onPressed: () {
           if (_title.text.isNotEmpty &&
@@ -262,7 +284,10 @@ class _AddOrUpdateScreenState extends State<AddOrUpdateScreen> {
                   );
 
               if (widget.isUpdate) {
-                context.read<ExpenseBloc>().add(const FetchExpensesPaging(""));
+                context.read<ExpenseBloc>().add(FetchExpensesPaging(
+                    "",
+                    ExpenseOrderBy.createdAt.toString().split('.').last,
+                    OrderDir.DESC.toString().split('.').last));
               } else {
                 context
                     .read<ExpenseBloc>()
@@ -300,7 +325,10 @@ class _AddOrUpdateScreenState extends State<AddOrUpdateScreen> {
                   );
 
               if (widget.isUpdate) {
-                context.read<IncomeBloc>().add(const FetchIncomesPaging(""));
+                context.read<IncomeBloc>().add(FetchIncomesPaging(
+                    "",
+                    IncomeOrderBy.createdAt.toString().split('.').last,
+                    OrderDir.DESC.toString().split('.').last));
               } else {
                 context
                     .read<IncomeBloc>()

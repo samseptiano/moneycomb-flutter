@@ -82,23 +82,26 @@ class FetchIncomes extends IncomeEvent {
   List<Object?> get props => [];
 }
 
-
 class FetchIncomesPaging extends IncomeEvent {
-    final String query;
+  final String query;
+  final String orderBy;
+  final String orderDir;
 
-  const FetchIncomesPaging(this.query);
+  const FetchIncomesPaging(this.query, this.orderBy, this.orderDir);
 
   @override
-  List<Object?> get props => [query];
+  List<Object?> get props => [query, orderBy, orderDir];
 }
 
 class LoadMoreIncomes extends IncomeEvent {
-    final String query;
+  final String query;
+  final String orderBy;
+  final String orderDir;
 
-  const LoadMoreIncomes(this.query);
-  
+  const LoadMoreIncomes(this.query, this.orderBy, this.orderDir);
+
   @override
-  List<Object?> get props => [query];
+  List<Object?> get props => [query, orderBy, orderDir];
 }
 
 // Fetch Specific Income by ID

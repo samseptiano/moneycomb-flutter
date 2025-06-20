@@ -42,7 +42,7 @@ class IncomeBloc extends Bloc<IncomeEvent, IncomeState> {
     on<FetchIncomesPaging>((event, emit) async {
       _currentOffset = 0;
       incomes = await DatabaseService.instance
-          .readAllIncomesPaging(search: event.query, limit: _pageSize, offset: _currentOffset);
+          .readAllIncomesPaging(search: event.query, limit: _pageSize, offset: _currentOffset, orderBy: event.orderBy, orderDir: event.orderDir);
       emit(DisplayIncomesPaging(income: incomes));
     });
 
@@ -51,7 +51,7 @@ class IncomeBloc extends Bloc<IncomeEvent, IncomeState> {
         final currentState = state as DisplayIncomesPaging;
         _currentOffset += _pageSize;
         final moreIncomes = incomes = await DatabaseService.instance
-            .readAllIncomesPaging(search: event.query, limit: _pageSize, offset: _currentOffset);
+            .readAllIncomesPaging(search: event.query, limit: _pageSize, offset: _currentOffset, orderBy: event.orderBy, orderDir: event.orderDir);
 
         // If no more data, return same state
         if (moreIncomes.isEmpty) return;

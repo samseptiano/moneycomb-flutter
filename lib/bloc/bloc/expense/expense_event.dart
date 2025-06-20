@@ -77,20 +77,23 @@ class FetchExpenses extends ExpenseEvent {
 // Fetch All Expenses with paging Event
 class FetchExpensesPaging extends ExpenseEvent {
   final String query;
+  final String orderBy;
+  final String orderDir;
 
-  const FetchExpensesPaging(this.query);
+  const FetchExpensesPaging(this.query, this.orderBy, this.orderDir);
 
   @override
-  List<Object?> get props => [query];
+  List<Object?> get props => [query, orderBy, orderDir];
 }
 
 class LoadMoreExpenses extends ExpenseEvent {
   final String query;
-
-  const LoadMoreExpenses(this.query);
+  final String orderBy;
+  final String orderDir;
+  const LoadMoreExpenses(this.query, this.orderBy, this.orderDir);
 
   @override
-  List<Object?> get props => [query];
+  List<Object?> get props => [query, orderBy, orderDir];
 }
 
 // Fetch Specific Expense by ID

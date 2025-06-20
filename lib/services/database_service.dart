@@ -188,9 +188,10 @@ class DatabaseService {
     String search = "",
     int limit = Constants.transactionHistoryPageSize,
     int offset = 0,
+    String orderBy = ExpenseFields.createdAt,
+    String orderDir = 'DESC', // or 'ASC'
   }) async {
     final db = await instance.database;
-    const orderBy = '${ExpenseFields.createdAt} DESC';
 
     String where = '${ExpenseFields.fgActive} = 1';
     List<String> whereArgs = [];
@@ -212,7 +213,7 @@ class DatabaseService {
       whereArgs: whereArgs,
       limit: limit,
       offset: offset,
-      orderBy: orderBy,
+      orderBy: '$orderBy $orderDir', // Dynamic sorting
     );
 
     return result.map((json) => Expense.fromJson(json)).toList();
@@ -246,13 +247,14 @@ class DatabaseService {
     return result.map((json) => Income.fromJson(json)).toList();
   }
 
-   Future<List<Income>> readAllIncomesPaging({
+  Future<List<Income>> readAllIncomesPaging({
     String search = "",
     int limit = Constants.transactionHistoryPageSize,
     int offset = 0,
+    String orderBy = IncomeFields.createdAt,
+    String orderDir = 'DESC', // or 'ASC'
   }) async {
     final db = await instance.database;
-    const orderBy = '${IncomeFields.createdAt} DESC';
 
     String where = '${IncomeFields.fgActive} = 1';
     List<String> whereArgs = [];
@@ -269,12 +271,12 @@ class DatabaseService {
     }
 
     final result = await db.query(
-      expenseTable,
+      incomeTable,
       where: where,
       whereArgs: whereArgs,
       limit: limit,
       offset: offset,
-      orderBy: orderBy,
+      orderBy: '$orderBy $orderDir', // Dynamic sorting
     );
 
     return result.map((json) => Income.fromJson(json)).toList();

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../bloc/bloc/expense/expense_bloc.dart';
 import '../../bloc/bloc/income/income_bloc.dart';
+import '../../constants/constants.dart';
 import '../../util/stringUtil.dart';
 import '../page/detail_transaction_screen.dart';
 
@@ -40,7 +41,7 @@ class TransactionList extends StatelessWidget {
             extentRatio: 0.25,
             children: [
               SlidableAction(
-                onPressed: (_) => _confirmDelete(context, item.id),
+                onPressed: (_) => _confirmDelete(context, item.id, isExpense),
                 backgroundColor: Colors.transparent,
                 foregroundColor: Colors.red,
                 icon: Icons.delete,
@@ -51,21 +52,30 @@ class TransactionList extends StatelessWidget {
           child: GestureDetector(
             onTap: () {
               if (isExpense) {
-                context.read<ExpenseBloc>().add(FetchSpecificExpense(id: item.id!));
+                context
+                    .read<ExpenseBloc>()
+                    .add(FetchSpecificExpense(id: item.id!));
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const DetailTransactionScreen(isExpense: true)),
+                  MaterialPageRoute(
+                      builder: (_) =>
+                          const DetailTransactionScreen(isExpense: true)),
                 );
               } else {
-                context.read<IncomeBloc>().add(FetchSpecificIncome(id: item.id!));
+                context
+                    .read<IncomeBloc>()
+                    .add(FetchSpecificIncome(id: item.id!));
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const DetailTransactionScreen(isExpense: false)),
+                  MaterialPageRoute(
+                      builder: (_) =>
+                          const DetailTransactionScreen(isExpense: false)),
                 );
               }
             },
             child: Card(
               elevation: 6,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
               margin: const EdgeInsets.symmetric(vertical: 8),
               color: isExpense ? Colors.redAccent : Colors.green,
               child: Column(
@@ -76,7 +86,8 @@ class TransactionList extends StatelessWidget {
                       alignment: Alignment.topRight,
                       child: Text(
                         DateFormat('dd MMM yyyy hh:mm').format(item.createdAt),
-                        style: const TextStyle(color: Colors.white70, fontSize: 11),
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 11),
                       ),
                     ),
                   ),
@@ -123,34 +134,55 @@ class TransactionList extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, int id) async {
+  void _confirmDelete(BuildContext context, int id, bool isExpense) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirm Delete'),
-        content: const Text('Are you sure you want to delete this transaction?'),
+        content:
+            const Text('Are you sure you want to delete this transaction?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
         ],
       ),
     );
 
     if (shouldDelete == true) {
       final scaffold = ScaffoldMessenger.of(context);
+
       if (isExpense) {
         final bloc = context.read<ExpenseBloc>();
         bloc.add(DeleteExpense(id: id));
-        bloc.add(const FetchExpenses());
-        bloc.add(const FetchExpensesPaging(""));
+
+        // wait briefly if needed before re-fetch
+        await Future.delayed(const Duration(milliseconds: 300));
+
+        bloc.add(FetchExpensesPaging(
+            "",
+            ExpenseOrderBy.createdAt.toString().split('.').last,
+            OrderDir.DESC.toString().split('.').last));
       } else {
         final bloc = context.read<IncomeBloc>();
         bloc.add(DeleteIncome(id: id));
-        bloc.add(const FetchIncomes());
-        bloc.add(const FetchIncomesPaging(""));
+
+        await Future.delayed(const Duration(milliseconds: 300));
+
+        bloc.add(FetchIncomesPaging(
+            "",
+            IncomeOrderBy.createdAt.toString().split('.').last,
+            OrderDir.DESC.toString().split('.').last));
       }
 
-      scaffold.showSnackBar(const SnackBar(content: Text('Transaction deleted')));
+      scaffold.showSnackBar(
+        const SnackBar(content: Text('Transaction deleted')),
+      );
     }
   }
 }
