@@ -47,10 +47,10 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen>
           onPressed: () {
               context
                   .read<ExpenseBloc>()
-                  .add(const FetchAllExpensesTotalExpensesByMonth());
+                  .add(const FetchAllExpensesTotalExpensesByMonthAndYear());
               context
                   .read<IncomeBloc>()
-                  .add(const FetchAllIncomeTotalIncomeByMonth());
+                  .add(const FetchAllIncomeTotalIncomeByMonthAndYear());
             
             Navigator.pop(context);
           },

@@ -58,6 +58,14 @@ class UpdateExpense extends ExpenseEvent {
   List<Object?> get props => [expense];
 }
 
+// Fetch FetchAllExpensesTotalExpensesByMonthAndYear Event
+class FetchAllExpensesTotalExpensesByMonthAndYear extends ExpenseEvent {
+  const FetchAllExpensesTotalExpensesByMonthAndYear();
+
+  @override
+  List<Object?> get props => [];
+}
+
 // Fetch FetchAllExpensesTotalExpensesByMonth Event
 class FetchAllExpensesTotalExpensesByMonth extends ExpenseEvent {
   const FetchAllExpensesTotalExpensesByMonth();

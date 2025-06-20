@@ -40,6 +40,23 @@ class DisplayExpensesWithTotal extends ExpenseState {
   List<Object> get props => [expenses, total];
 }
 
+class DisplayExpensesWithTotalYear extends ExpenseState {
+  final List<Expense> expenses;
+  final double total;
+    final double totalYear;
+
+
+  const DisplayExpensesWithTotalYear({
+    required this.expenses,
+    required this.total,
+    required this.totalYear,
+
+  });
+
+  @override
+  List<Object> get props => [expenses, total, totalYear];
+}
+
 class DisplaySpecificExpense extends ExpenseState {
   final Expense expense;
 

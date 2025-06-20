@@ -32,7 +32,7 @@ class TotalCardHome extends StatelessWidget {
     return Card(
       elevation: 6,
       color: cardColor,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      margin: const EdgeInsets.symmetric(horizontal:0, vertical: 0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),

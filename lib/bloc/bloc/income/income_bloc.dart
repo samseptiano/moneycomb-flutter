@@ -46,8 +46,20 @@ class IncomeBloc extends Bloc<IncomeEvent, IncomeState> {
 
     on<FetchAllIncomeTotalIncomeByMonth>((event, emit) async {
       final incomes = await DatabaseService.instance.readAllIncomes();
-      final total = await DatabaseService.instance.readTotalIncomeByCurrentMonth();
+      final total =
+          await DatabaseService.instance.readTotalIncomeByCurrentMonth();
       emit(DisplayIncomesWithTotal(incomes: incomes, total: total));
+    });
+
+    on<FetchAllIncomeTotalIncomeByMonthAndYear>((event, emit) async {
+      final incomes = await DatabaseService.instance.readAllIncomes();
+      final total =
+          await DatabaseService.instance.readTotalIncomeByCurrentMonth();
+      final totalyear =
+          await DatabaseService.instance.readTotalIncomeByCurrentYear();
+
+      emit(DisplayIncomesWithTotalYear(
+          incomes: incomes, total: total, totalYear: totalyear));
     });
   }
 }

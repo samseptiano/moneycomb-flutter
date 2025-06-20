@@ -49,8 +49,20 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
     on<FetchAllExpensesTotalExpensesByMonth>((event, emit) async {
       final expenses = await DatabaseService.instance.readAllExpenses();
-      final total = await DatabaseService.instance.readTotalExpenseByCurrentMonth();
+      final total =
+          await DatabaseService.instance.readTotalExpenseByCurrentMonth();
       emit(DisplayExpensesWithTotal(expenses: expenses, total: total));
+    });
+
+    on<FetchAllExpensesTotalExpensesByMonthAndYear>((event, emit) async {
+      final expenses = await DatabaseService.instance.readAllExpenses();
+      final total =
+          await DatabaseService.instance.readTotalExpenseByCurrentMonth();
+      final totalYear =
+          await DatabaseService.instance.readTotalExpenseByCurrentYear();
+
+      emit(DisplayExpensesWithTotalYear(
+          expenses: expenses, total: total, totalYear: totalYear));
     });
   }
 }

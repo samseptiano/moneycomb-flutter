@@ -96,6 +96,21 @@ class DatabaseService {
     return (total is num) ? total.toDouble() : 0.0;
   }
 
+  Future<double> readTotalExpenseByCurrentYear() async {
+  final db = await instance.database;
+
+  final result = await db.rawQuery('''
+    SELECT SUM(${ExpenseFields.nominal}) as total
+    FROM $expenseTable
+    WHERE fgActive = 1
+      AND strftime('%Y', createdAt) = strftime('%Y', 'now')
+  ''');
+
+  final total = result.first['total'];
+  return (total is num) ? total.toDouble() : 0.0;
+}
+
+
   Future<double> readTotalIncome() async {
     final db = await instance.database;
 
@@ -114,6 +129,20 @@ class DatabaseService {
     FROM $incomeTable
     WHERE fgActive = 1
       AND strftime('%Y-%m', createdAt) = strftime('%Y-%m', 'now')
+  ''');
+
+    final total = result.first['total'];
+    return (total is num) ? total.toDouble() : 0.0;
+  }
+
+    Future<double> readTotalIncomeByCurrentYear() async {
+    final db = await instance.database;
+
+    final result = await db.rawQuery('''
+    SELECT SUM(${IncomeFields.nominal}) as total
+    FROM $incomeTable
+    WHERE fgActive = 1
+      AND strftime('%Y', createdAt) = strftime('%Y', 'now')
   ''');
 
     final total = result.first['total'];

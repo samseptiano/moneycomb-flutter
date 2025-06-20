@@ -39,9 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // Dispatch events to fetch data on startup
     context
         .read<ExpenseBloc>()
-        .add(const FetchAllExpensesTotalExpensesByMonth());
+        .add(const FetchAllExpensesTotalExpensesByMonthAndYear());
 
-    context.read<IncomeBloc>().add(const FetchAllIncomeTotalIncomeByMonth());
+    context.read<IncomeBloc>().add(const FetchAllIncomeTotalIncomeByMonthAndYear());
   }
 
   @override
@@ -63,16 +63,16 @@ class _HomeScreenState extends State<HomeScreen> {
           // Income BLoC
           BlocBuilder<IncomeBloc, IncomeState>(
             builder: (context, state) {
-              if (state is DisplayIncomesWithTotal) {
+              if (state is DisplayIncomesWithTotalYear) {
                 return TotalCardHome(
                   title: 'This Month Income',
                   subTitle: 'YTD Income',
                   amountMonth: state.total,
-                  amountYtd: state.total,
+                  amountYtd: state.totalYear,
                   isExpense: false,
                 );
               } else {
-                return const SizedBox(height: 100); // Reserve space
+                return const SizedBox(height: 10); // Reserve space
               }
             },
           ),
@@ -82,12 +82,12 @@ class _HomeScreenState extends State<HomeScreen> {
           // Expense BLoC
           BlocBuilder<ExpenseBloc, ExpenseState>(
             builder: (context, state) {
-              if (state is DisplayExpensesWithTotal) {
+              if (state is DisplayExpensesWithTotalYear) {
                 return TotalCardHome(
                   title: 'This Month Expense',
                   subTitle: 'YTD Expense',
                   amountMonth: state.total,
-                  amountYtd: state.total,
+                  amountYtd: state.totalYear,
                   isExpense: true,
                 );
               } else {
@@ -110,15 +110,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16, vertical: 16),
                 onTap: item.onTap,
-                leading: Icon(item.icon, size: 50, color: Colors.blue),
+                leading: Icon(item.icon, size: 35, color: Colors.blue),
                 title: Text(
                   item.label,
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 20,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 30),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 20),
               ),
             ),
           ),

@@ -58,6 +58,13 @@ class UpdateIncome extends IncomeEvent {
   List<Object?> get props => [income];
 }
 
+// Fetch FetchAllIncomeTotalIncomeByMonthAndYear Event
+class FetchAllIncomeTotalIncomeByMonthAndYear extends IncomeEvent {
+  const FetchAllIncomeTotalIncomeByMonthAndYear();
+
+  @override
+  List<Object?> get props => [];
+}
 
 // Fetch FetchAllIncomeTotalIncomeByMonth Event
 class FetchAllIncomeTotalIncomeByMonth extends IncomeEvent {

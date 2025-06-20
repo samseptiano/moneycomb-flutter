@@ -38,6 +38,23 @@ class DisplayIncomesWithTotal extends IncomeState {
   List<Object> get props => [incomes, total];
 }
 
+class DisplayIncomesWithTotalYear extends IncomeState {
+  final List<Income> incomes;
+  final double total;
+  final double totalYear;
+
+  const DisplayIncomesWithTotalYear({
+    required this.incomes,
+    required this.total,
+        required this.totalYear,
+
+  });
+
+  @override
+  List<Object> get props => [incomes, total, totalYear];
+}
+
+
 class DisplaySpecificIncome extends IncomeState {
   final Income income;
 
