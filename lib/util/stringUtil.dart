@@ -28,4 +28,15 @@ class StringUtil {
       return '–';
     }
   }
+
+  static String formatYAxisLabel(double value, double maxY) {
+  if (maxY >= 1000000) {
+    return '${(value / 1000000).toStringAsFixed(1)}M';
+  } else if (maxY >= 1000) {
+    return '${(value / 1000).toStringAsFixed(0)}K';
+  } else {
+    return value.toStringAsFixed(0);
+  }
+}
+
 }

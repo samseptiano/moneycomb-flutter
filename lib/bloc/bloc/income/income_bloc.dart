@@ -119,5 +119,12 @@ class IncomeBloc extends Bloc<IncomeEvent, IncomeState> {
           last2Month: last2Month,
           avg3Month: avg3Month));
     });
+
+    on<FetchIncomesSummaryChart>((event, emit) async {
+      final ytd = await DatabaseService.instance.readYTDIncomesGroupByMonth();
+      final monthBycategory = await DatabaseService.instance.readCurrentMonthIncomesGroupByCategory();
+
+      emit(DisplayIncomesSummaryChart(ytd: ytd, monthByCategory: monthBycategory));
+    });
   }
 }

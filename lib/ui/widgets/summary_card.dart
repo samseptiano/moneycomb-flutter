@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:money_comb/ui/page/summary_chart_screen.dart';
 import 'package:money_comb/util/dialog_helper.dart';
 import 'package:money_comb/util/stringUtil.dart';
 
@@ -111,7 +112,9 @@ class SummaryCard extends StatelessWidget {
                 differenceLabel,
                 style: TextStyle(
                   fontSize: 14,
-                  color: (differenceLabel == "↑") ? Colors.green[900] : Colors.red[900],
+                  color: (differenceLabel == "↑")
+                      ? Colors.green[900]
+                      : Colors.red[900],
                 ),
               ),
             ],
@@ -204,10 +207,10 @@ class SummaryCard extends StatelessWidget {
               ),
               const Divider(height: 32),
 
-              buildComparisonTile(context, "YTD", ytdInfo, ytd,
-                  (ytd / thisMonth) * 100),
-              buildComparisonTile(context, "Last Year", lastYearInfo,
-                  lastYear, (lastYear / ytd) * 100),
+              buildComparisonTile(
+                  context, "YTD", ytdInfo, ytd, (ytd / thisMonth) * 100),
+              buildComparisonTile(context, "Last Year", lastYearInfo, lastYear,
+                  (lastYear / ytd) * 100),
 
               const SizedBox(height: 16), // ← Added spacing
 
@@ -243,6 +246,26 @@ class SummaryCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: Colors.white),
               ),
+              const SizedBox(height: 20),
+              TextButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => SummaryChartScreen(isExpense: isExpense ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.show_chart, color: Colors.white),
+                label: const Text(
+                  'Show Chart',
+                  style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+              ),
+              const Divider(),
             ],
           ),
         ),

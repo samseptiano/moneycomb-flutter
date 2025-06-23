@@ -77,3 +77,18 @@ class DisplayExpensesSummary extends ExpenseState {
   List<Object> get props =>
       [ytd, lastYear, month, lastMonth, last2Month, avg3Month];
 }
+
+
+class DisplayExpensesSummaryChart extends ExpenseState {
+  final List<Map<String, dynamic>> ytd;
+  final Map<String, double> monthByCategory;
+
+  const DisplayExpensesSummaryChart({
+    required this.ytd,
+    required this.monthByCategory
+  });
+
+  @override
+  List<Object> get props =>
+      [ytd, monthByCategory];
+}

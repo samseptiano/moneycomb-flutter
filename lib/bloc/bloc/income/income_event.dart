@@ -131,3 +131,11 @@ class FetchIncomesSummary extends IncomeEvent {
   @override
   List<Object?> get props => [];
 }
+
+// Fetch Incomes Summary Chart Event
+class FetchIncomesSummaryChart extends IncomeEvent {
+  const FetchIncomesSummaryChart();
+
+  @override
+  List<Object?> get props => [];
+}

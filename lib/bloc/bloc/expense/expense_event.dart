@@ -124,3 +124,11 @@ class FetchExpensesSummary extends ExpenseEvent {
   @override
   List<Object?> get props => [];
 }
+
+// Fetch Expenses Summary Chart Event
+class FetchExpensesSummaryChart extends ExpenseEvent {
+  const FetchExpensesSummaryChart();
+
+  @override
+  List<Object?> get props => [];
+}

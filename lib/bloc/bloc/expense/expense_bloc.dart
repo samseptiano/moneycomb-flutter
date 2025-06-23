@@ -113,5 +113,12 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
           last2Month: last2Month,
           avg3Month: avg3Month));
     });
+
+    on<FetchExpensesSummaryChart>((event, emit) async {
+      final ytd = await DatabaseService.instance.readYTDExpensesGroupByMonth();
+      final monthBycategory = await DatabaseService.instance.readCurrentMonthExpensesGroupByCategory();
+
+      emit(DisplayExpensesSummaryChart(ytd: ytd, monthByCategory: monthBycategory));
+    });
   }
 }

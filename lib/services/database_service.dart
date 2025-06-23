@@ -77,6 +77,99 @@ class DatabaseService {
     return income.copy(id: id);
   }
 
+
+Future<List<Map<String, dynamic>>> readYTDExpensesGroupByMonth() async {
+  final db = await instance.database;
+
+  final result = await db.rawQuery('''
+    SELECT strftime('%m', ${ExpenseFields.createdAt}) as month,
+           SUM(${ExpenseFields.nominal}) as total
+    FROM $expenseTable
+    WHERE fgActive = 1
+      AND strftime('%Y', ${ExpenseFields.createdAt}) = strftime('%Y', 'now')
+      AND strftime('%m', ${ExpenseFields.createdAt}) <= strftime('%m', 'now')
+    GROUP BY month
+    ORDER BY month
+  ''');
+
+  final now = DateTime.now();
+  final currentMonth = now.month;
+
+  // Fill in all months with default 0
+  final Map<int, double> resultMap = {for (var i = 1; i <= currentMonth; i++) i: 0.0};
+
+  for (var row in result) {
+    final monthStr = row['month']?.toString() ?? '0';
+    final month = int.tryParse(monthStr) ?? 0;
+
+    final totalRaw = row['total'];
+    double total = 0.0;
+
+    if (totalRaw != null) {
+      if (totalRaw is int) {
+        total = totalRaw.toDouble();
+      } else if (totalRaw is double) {
+        total = totalRaw;
+      } else if (totalRaw is String) {
+        total = double.tryParse(totalRaw) ?? 0.0;
+      }
+    }
+
+    resultMap[month] = total;
+  }
+
+  // Convert to list of maps and print
+  final resultList = resultMap.entries.map((e) => {
+        'month': e.key,
+        'total': e.value,
+      }).toList();
+
+  for (var entry in resultList) {
+    print("Monthhh: ${entry['month']}, Total: ${entry['total']}");
+  }
+
+  return resultList;
+}
+
+
+Future<Map<String, double>> readCurrentMonthExpensesGroupByCategory() async {
+  final db = await instance.database;
+  final now = DateTime.now();
+  final String currentYear = now.year.toString();
+  final String currentMonth = now.month.toString().padLeft(2, '0');
+
+  final result = await db.rawQuery('''
+    SELECT ${ExpenseFields.category} as category,
+           SUM(${ExpenseFields.nominal}) as total
+    FROM $expenseTable
+    WHERE fgActive = 1
+      AND strftime('%Y', ${ExpenseFields.createdAt}) = ?
+      AND strftime('%m', ${ExpenseFields.createdAt}) = ?
+    GROUP BY category
+  ''', [currentYear, currentMonth]);
+
+  final Map<String, double> data = {};
+  for (var row in result) {
+    final name = row['category']?.toString() ?? 'Unknown';
+    final rawTotal = row['total'];
+
+    double total = 0.0;
+    if (rawTotal != null) {
+      if (rawTotal is int) {
+        total = rawTotal.toDouble();
+      } else if (rawTotal is double) {
+        total = rawTotal;
+      } else if (rawTotal is String) {
+        total = double.tryParse(rawTotal) ?? 0.0;
+      }
+    }
+
+    data[name] = total;
+  }
+
+  return data;
+}
+
   Future<double> readTotalExpense() async {
     final db = await instance.database;
 
@@ -122,8 +215,6 @@ Future<double> readAverageExpenseLast3Months() async {
   print('Average (this + last 2 months): $average');
   return average;
 }
-
-
 
 
   Future<double> readTotalExpenseByCurrentMonth() async {
@@ -203,6 +294,100 @@ Future<double> readAverageExpenseLast3Months() async {
     final total = result.first['total'];
     return (total is num) ? total.toDouble() : 0.0;
   }
+
+
+
+Future<List<Map<String, dynamic>>> readYTDIncomesGroupByMonth() async {
+  final db = await instance.database;
+
+  final result = await db.rawQuery('''
+    SELECT strftime('%m', ${IncomeFields.createdAt}) as month,
+           SUM(${IncomeFields.nominal}) as total
+    FROM $incomeTable
+    WHERE fgActive = 1
+      AND strftime('%Y', ${IncomeFields.createdAt}) = strftime('%Y', 'now')
+      AND strftime('%m', ${IncomeFields.createdAt}) <= strftime('%m', 'now')
+    GROUP BY month
+    ORDER BY month
+  ''');
+
+  final now = DateTime.now();
+  final currentMonth = now.month;
+
+  // Fill in all months with default 0
+  final Map<int, double> resultMap = {for (var i = 1; i <= currentMonth; i++) i: 0.0};
+
+  for (var row in result) {
+    final monthStr = row['month']?.toString() ?? '0';
+    final month = int.tryParse(monthStr) ?? 0;
+
+    final totalRaw = row['total'];
+    double total = 0.0;
+
+    if (totalRaw != null) {
+      if (totalRaw is int) {
+        total = totalRaw.toDouble();
+      } else if (totalRaw is double) {
+        total = totalRaw;
+      } else if (totalRaw is String) {
+        total = double.tryParse(totalRaw) ?? 0.0;
+      }
+    }
+
+    resultMap[month] = total;
+  }
+
+  // Convert to list of maps and print
+  final resultList = resultMap.entries.map((e) => {
+        'month': e.key,
+        'total': e.value,
+      }).toList();
+
+  for (var entry in resultList) {
+    print("Monthhh: ${entry['month']}, Nominal: ${entry['total']}");
+  }
+
+  return resultList;
+}
+
+
+Future<Map<String, double>> readCurrentMonthIncomesGroupByCategory() async {
+  final db = await instance.database;
+  final now = DateTime.now();
+  final String currentYear = now.year.toString();
+  final String currentMonth = now.month.toString().padLeft(2, '0');
+
+  final result = await db.rawQuery('''
+    SELECT ${IncomeFields.category} as category,
+           SUM(${IncomeFields.nominal}) as total
+    FROM $incomeTable
+    WHERE fgActive = 1
+      AND strftime('%Y', ${IncomeFields.createdAt}) = ?
+      AND strftime('%m', ${IncomeFields.createdAt}) = ?
+    GROUP BY category
+  ''', [currentYear, currentMonth]);
+
+  final Map<String, double> data = {};
+  for (var row in result) {
+    final name = row['category']?.toString() ?? 'Unknown';
+    final rawTotal = row['total'];
+
+    double total = 0.0;
+    if (rawTotal != null) {
+      if (rawTotal is int) {
+        total = rawTotal.toDouble();
+      } else if (rawTotal is double) {
+        total = rawTotal;
+      } else if (rawTotal is String) {
+        total = double.tryParse(rawTotal) ?? 0.0;
+      }
+    }
+
+    data[name] = total;
+  }
+
+  return data;
+}
 
   Future<double> readTotalIncome() async {
     final db = await instance.database;
