@@ -41,8 +41,12 @@ class IncomeBloc extends Bloc<IncomeEvent, IncomeState> {
 
     on<FetchIncomesPaging>((event, emit) async {
       _currentOffset = 0;
-      incomes = await DatabaseService.instance
-          .readAllIncomesPaging(search: event.query, limit: _pageSize, offset: _currentOffset, orderBy: event.orderBy, orderDir: event.orderDir);
+      incomes = await DatabaseService.instance.readAllIncomesPaging(
+          search: event.query,
+          limit: _pageSize,
+          offset: _currentOffset,
+          orderBy: event.orderBy,
+          orderDir: event.orderDir);
       emit(DisplayIncomesPaging(income: incomes));
     });
 
@@ -51,7 +55,12 @@ class IncomeBloc extends Bloc<IncomeEvent, IncomeState> {
         final currentState = state as DisplayIncomesPaging;
         _currentOffset += _pageSize;
         final moreIncomes = incomes = await DatabaseService.instance
-            .readAllIncomesPaging(search: event.query, limit: _pageSize, offset: _currentOffset, orderBy: event.orderBy, orderDir: event.orderDir);
+            .readAllIncomesPaging(
+                search: event.query,
+                limit: _pageSize,
+                offset: _currentOffset,
+                orderBy: event.orderBy,
+                orderDir: event.orderDir);
 
         // If no more data, return same state
         if (moreIncomes.isEmpty) return;
@@ -87,6 +96,28 @@ class IncomeBloc extends Bloc<IncomeEvent, IncomeState> {
 
       emit(DisplayIncomesWithTotalYear(
           incomes: incomes, total: total, totalYear: totalyear));
+    });
+
+    on<FetchIncomesSummary>((event, emit) async {
+      final ytd =
+          await DatabaseService.instance.readTotalIncomeByCurrentYear();
+      final lastYear =
+          await DatabaseService.instance.readTotalIncomeByLastYear();
+      final month =
+          await DatabaseService.instance.readTotalIncomeByCurrentMonth();
+      final lastMonth =
+          await DatabaseService.instance.readTotalIncomeByLastMonth();
+      final last2Month =
+          await DatabaseService.instance.readTotalIncomeByTwoMonthsAgo();
+      final avg3Month =
+          await DatabaseService.instance.readAverageIncomeLast3Months();
+      emit(DisplayIncomeSummary(
+          ytd: ytd,
+          lastYear: lastYear,
+          month: month,
+          lastMonth: lastMonth,
+          last2Month: last2Month,
+          avg3Month: avg3Month));
     });
   }
 }

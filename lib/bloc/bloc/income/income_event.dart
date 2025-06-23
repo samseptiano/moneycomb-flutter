@@ -123,3 +123,11 @@ class DeleteIncome extends IncomeEvent {
   @override
   List<Object?> get props => [id];
 }
+
+// Fetch Income Summary Event
+class FetchIncomesSummary extends IncomeEvent {
+  const FetchIncomesSummary();
+
+  @override
+  List<Object?> get props => [];
+}

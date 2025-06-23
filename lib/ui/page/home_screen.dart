@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_comb/ui/page/setting_screen.dart';
+import 'package:money_comb/ui/page/summary_screen.dart';
 import 'package:money_comb/ui/page/transaction_history_screen.dart';
 import '../../bloc/bloc/expense/expense_bloc.dart';
 import '../../bloc/bloc/income/income_bloc.dart';
@@ -33,7 +34,12 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
       ),
-      _HomeItem(icon: Icons.bar_chart, label: 'Summary', onTap: () {}),
+      _HomeItem(icon: Icons.bar_chart, label: 'Summary', onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(builder: (c) => const SummaryScreen()),
+          );
+      }),
       _HomeItem(icon: Icons.settings, label: 'Setting', onTap: () {
         Navigator.push(
             context,

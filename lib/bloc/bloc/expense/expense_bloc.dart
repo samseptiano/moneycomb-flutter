@@ -40,10 +40,14 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     });
 
     on<FetchExpensesPaging>((event, emit) async {
-        _currentOffset = 0; 
-        
-      expenses = await DatabaseService.instance
-          .readAllExpensesPaging(search:event.query, limit: _pageSize, offset: _currentOffset, orderBy: event.orderBy, orderDir: event.orderDir);
+      _currentOffset = 0;
+
+      expenses = await DatabaseService.instance.readAllExpensesPaging(
+          search: event.query,
+          limit: _pageSize,
+          offset: _currentOffset,
+          orderBy: event.orderBy,
+          orderDir: event.orderDir);
       emit(DisplayExpensesPaging(expense: expenses));
     });
 
@@ -52,7 +56,12 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
         final currentState = state as DisplayExpensesPaging;
         _currentOffset += _pageSize;
         final moreExpenses = expenses = await DatabaseService.instance
-          .readAllExpensesPaging(search:event.query, limit: _pageSize, offset: _currentOffset, orderBy: event.orderBy, orderDir: event.orderDir);
+            .readAllExpensesPaging(
+                search: event.query,
+                limit: _pageSize,
+                offset: _currentOffset,
+                orderBy: event.orderBy,
+                orderDir: event.orderDir);
         // If no more data, return same state
         if (moreExpenses.isEmpty) return;
 
@@ -81,6 +90,28 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
       emit(DisplayExpensesWithTotalYear(
           expenses: expenses, total: total, totalYear: totalYear));
+    });
+
+    on<FetchExpensesSummary>((event, emit) async {
+      final ytd =
+          await DatabaseService.instance.readTotalExpenseByCurrentYear();
+      final lastYear =
+          await DatabaseService.instance.readTotalExpenseByLastYear();
+      final month =
+          await DatabaseService.instance.readTotalExpenseByCurrentMonth();
+      final lastMonth =
+          await DatabaseService.instance.readTotalExpenseByLastMonth();
+      final last2Month =
+          await DatabaseService.instance.readTotalIncomeByTwoMonthsAgo();
+      final avg3Month =
+          await DatabaseService.instance.readAverageExpenseLast3Months();
+      emit(DisplayExpensesSummary(
+          ytd: ytd,
+          lastYear: lastYear,
+          month: month,
+          lastMonth: lastMonth,
+          last2Month: last2Month,
+          avg3Month: avg3Month));
     });
   }
 }

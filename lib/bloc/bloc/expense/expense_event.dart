@@ -115,3 +115,12 @@ class DeleteExpense extends ExpenseEvent {
   @override
   List<Object?> get props => [id];
 }
+
+
+// Fetch Expenses Summary Event
+class FetchExpensesSummary extends ExpenseEvent {
+  const FetchExpensesSummary();
+
+  @override
+  List<Object?> get props => [];
+}

@@ -10,7 +10,7 @@ class TotalCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.amount,
-        required this.isExpense,
+    required this.isExpense,
   });
 
   @override

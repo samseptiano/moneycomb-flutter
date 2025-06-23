@@ -70,3 +70,26 @@ class DisplaySpecificIncome extends IncomeState {
   @override
   List<Object> get props => [income];
 }
+
+
+class DisplayIncomeSummary extends IncomeState {
+  final double ytd;
+  final double lastYear;
+  final double month;
+  final double lastMonth;
+  final double last2Month;
+  final double avg3Month;
+
+  const DisplayIncomeSummary({
+    required this.ytd,
+    required this.lastYear,
+    required this.month,
+    required this.lastMonth,
+    required this.last2Month,
+    required this.avg3Month,
+  });
+
+  @override
+  List<Object> get props =>
+      [ytd, lastYear, month, lastMonth, last2Month, avg3Month];
+}

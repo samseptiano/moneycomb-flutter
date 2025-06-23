@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:money_comb/models/expense.dart';
@@ -27,7 +28,8 @@ class DatabaseService {
   }
 
   Future _createDB(Database db, int version) async {
-    await db.execute('''
+    await db.execute(
+        '''
     CREATE TABLE expense (
       _id INTEGER PRIMARY KEY AUTOINCREMENT,
       isImportant BOOLEAN NOT NULL,
@@ -44,7 +46,8 @@ class DatabaseService {
     )
   ''');
 
-    await db.execute('''
+    await db.execute(
+        '''
     CREATE TABLE income (
       _id INTEGER PRIMARY KEY AUTOINCREMENT,
       isImportant BOOLEAN NOT NULL,
@@ -84,10 +87,50 @@ class DatabaseService {
     return (total is num) ? total.toDouble() : 0.0;
   }
 
+Future<double> readAverageExpenseLast3Months() async {
+  final db = await instance.database;
+  double total = 0;
+
+  final now = DateTime.now();
+
+  for (int i = 0; i < 3; i++) {
+    final targetMonth = DateTime(now.year, now.month - i, 1);
+    final start = DateFormat('yyyy-MM-dd').format(targetMonth);
+
+    // Get the last day of the month
+    final firstDayNextMonth = (targetMonth.month == 12)
+        ? DateTime(targetMonth.year + 1, 1, 1)
+        : DateTime(targetMonth.year, targetMonth.month + 1, 1);
+    final end = firstDayNextMonth.subtract(const Duration(days: 1));
+    final endStr = DateFormat('yyyy-MM-dd').format(end);
+
+    final result = await db.rawQuery('''
+      SELECT SUM(${ExpenseFields.nominal}) as total
+      FROM $expenseTable
+      WHERE fgActive = 1
+        AND date(${ExpenseFields.createdAt}) BETWEEN date(?) AND date(?)
+    ''', [start, endStr]);
+
+    final rowTotal = result.first['total'];
+    final monthlyTotal = (rowTotal is num) ? rowTotal.toDouble() : 0.0;
+    total += monthlyTotal;
+
+    print('Month: ${targetMonth.month}/${targetMonth.year}, Total: $monthlyTotal');
+  }
+
+  final average = total / 3;
+  print('Average (this + last 2 months): $average');
+  return average;
+}
+
+
+
+
   Future<double> readTotalExpenseByCurrentMonth() async {
     final db = await instance.database;
 
-    final result = await db.rawQuery('''
+    final result = await db.rawQuery(
+        '''
     SELECT SUM(${ExpenseFields.nominal}) as total
     FROM $expenseTable
     WHERE fgActive = 1
@@ -98,14 +141,63 @@ class DatabaseService {
     return (total is num) ? total.toDouble() : 0.0;
   }
 
+  Future<double> readTotalExpenseByLastMonth() async {
+    final db = await instance.database;
+
+    final result = await db.rawQuery(
+        '''
+    SELECT SUM(${ExpenseFields.nominal}) as total
+    FROM $expenseTable
+    WHERE fgActive = 1
+      AND date(createdAt) >= date('now', 'start of month', '-1 month')
+      AND date(createdAt) <  date('now', 'start of month')
+    ''');
+
+    final total = result.first['total'];
+    return (total is num) ? total.toDouble() : 0.0;
+  }
+
+  Future<double> readTotalExpenseByTwoMonthsAgo() async {
+    final db = await instance.database;
+
+    final result = await db.rawQuery(
+        '''
+    SELECT SUM(${ExpenseFields.nominal}) as total
+    FROM $expenseTable
+    WHERE fgActive = 1
+      AND date(createdAt) >= date('now', 'start of month', '-2 months')
+      AND date(createdAt) <  date('now', 'start of month', '-1 month')
+    ''');
+
+    final total = result.first['total'];
+    return (total is num) ? total.toDouble() : 0.0;
+  }
+
   Future<double> readTotalExpenseByCurrentYear() async {
     final db = await instance.database;
 
-    final result = await db.rawQuery('''
+    final result = await db.rawQuery(
+        '''
     SELECT SUM(${ExpenseFields.nominal}) as total
     FROM $expenseTable
     WHERE fgActive = 1
       AND strftime('%Y', createdAt) = strftime('%Y', 'now')
+  ''');
+
+    final total = result.first['total'];
+    return (total is num) ? total.toDouble() : 0.0;
+  }
+
+  Future<double> readTotalExpenseByLastYear() async {
+    final db = await instance.database;
+
+    final result = await db.rawQuery(
+        '''
+    SELECT SUM(${ExpenseFields.nominal}) as total
+    FROM $expenseTable
+    WHERE fgActive = 1
+      AND date(createdAt) >= date('now', 'start of year', '-1 year')
+      AND date(createdAt) < date('now', 'start of year')
   ''');
 
     final total = result.first['total'];
@@ -122,10 +214,47 @@ class DatabaseService {
     return (total is num) ? total.toDouble() : 0.0;
   }
 
+Future<double> readAverageIncomeLast3Months() async {
+  final db = await instance.database;
+  double total = 0;
+
+  final now = DateTime.now();
+
+  for (int i = 0; i < 3; i++) {
+    final targetMonth = DateTime(now.year, now.month - i, 1);
+    final start = DateFormat('yyyy-MM-dd').format(targetMonth);
+
+    // Get the last day of the month
+    final firstDayNextMonth = (targetMonth.month == 12)
+        ? DateTime(targetMonth.year + 1, 1, 1)
+        : DateTime(targetMonth.year, targetMonth.month + 1, 1);
+    final end = firstDayNextMonth.subtract(const Duration(days: 1));
+    final endStr = DateFormat('yyyy-MM-dd').format(end);
+
+    final result = await db.rawQuery('''
+      SELECT SUM(${IncomeFields.nominal}) as total
+      FROM $incomeTable
+      WHERE fgActive = 1
+        AND date(${IncomeFields.createdAt}) BETWEEN date(?) AND date(?)
+    ''', [start, endStr]);
+
+    final rowTotal = result.first['total'];
+    final monthlyTotal = (rowTotal is num) ? rowTotal.toDouble() : 0.0;
+    total += monthlyTotal;
+
+    print('Month: ${targetMonth.month}/${targetMonth.year}, Total: $monthlyTotal');
+  }
+
+  final average = total / 3;
+  print('Average (this + last 2 months): $average');
+  return average;
+}
+
   Future<double> readTotalIncomeByCurrentMonth() async {
     final db = await instance.database;
 
-    final result = await db.rawQuery('''
+    final result = await db.rawQuery(
+        '''
     SELECT SUM(${IncomeFields.nominal}) as total
     FROM $incomeTable
     WHERE fgActive = 1
@@ -136,14 +265,63 @@ class DatabaseService {
     return (total is num) ? total.toDouble() : 0.0;
   }
 
+  Future<double> readTotalIncomeByLastMonth() async {
+    final db = await instance.database;
+
+    final result = await db.rawQuery(
+        '''
+    SELECT SUM(${IncomeFields.nominal}) as total
+    FROM $incomeTable
+    WHERE fgActive = 1
+      AND date(createdAt) >= date('now', 'start of month', '-1 month')
+      AND date(createdAt) <  date('now', 'start of month')
+    ''');
+
+    final total = result.first['total'];
+    return (total is num) ? total.toDouble() : 0.0;
+  }
+
+  Future<double> readTotalIncomeByTwoMonthsAgo() async {
+    final db = await instance.database;
+
+    final result = await db.rawQuery(
+        '''
+    SELECT SUM(${IncomeFields.nominal}) as total
+    FROM $incomeTable
+    WHERE fgActive = 1
+      AND date(createdAt) >= date('now', 'start of month', '-2 months')
+      AND date(createdAt) <  date('now', 'start of month', '-1 month')
+    ''');
+
+    final total = result.first['total'];
+    return (total is num) ? total.toDouble() : 0.0;
+  }
+
   Future<double> readTotalIncomeByCurrentYear() async {
     final db = await instance.database;
 
-    final result = await db.rawQuery('''
+    final result = await db.rawQuery(
+        '''
     SELECT SUM(${IncomeFields.nominal}) as total
     FROM $incomeTable
     WHERE fgActive = 1
       AND strftime('%Y', createdAt) = strftime('%Y', 'now')
+  ''');
+
+    final total = result.first['total'];
+    return (total is num) ? total.toDouble() : 0.0;
+  }
+
+  Future<double> readTotalIncomeByLastYear() async {
+    final db = await instance.database;
+
+    final result = await db.rawQuery(
+        '''
+    SELECT SUM(${IncomeFields.nominal}) as total
+    FROM $incomeTable
+    WHERE fgActive = 1
+      AND date(createdAt) >= date('now', 'start of year', '-1 year')
+      AND date(createdAt) < date('now', 'start of year')
   ''');
 
     final total = result.first['total'];

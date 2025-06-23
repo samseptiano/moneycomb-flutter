@@ -7,7 +7,6 @@ abstract class ExpenseState extends Equatable {
 class ExpenseInitial extends ExpenseState {
   @override
   List<Object> get props => [];
-  
 }
 
 class DisplayTotalExpenses extends ExpenseState {
@@ -37,14 +36,12 @@ class DisplayExpensesPaging extends ExpenseState {
 class DisplayExpensesWithTotalYear extends ExpenseState {
   final List<Expense> expenses;
   final double total;
-    final double totalYear;
-
+  final double totalYear;
 
   const DisplayExpensesWithTotalYear({
     required this.expenses,
     required this.total,
     required this.totalYear,
-
   });
 
   @override
@@ -57,4 +54,26 @@ class DisplaySpecificExpense extends ExpenseState {
   const DisplaySpecificExpense({required this.expense});
   @override
   List<Object> get props => [expense];
+}
+
+class DisplayExpensesSummary extends ExpenseState {
+  final double ytd;
+  final double lastYear;
+  final double month;
+  final double lastMonth;
+  final double last2Month;
+  final double avg3Month;
+
+  const DisplayExpensesSummary({
+    required this.ytd,
+    required this.lastYear,
+    required this.month,
+    required this.lastMonth,
+    required this.last2Month,
+    required this.avg3Month,
+  });
+
+  @override
+  List<Object> get props =>
+      [ytd, lastYear, month, lastMonth, last2Month, avg3Month];
 }
